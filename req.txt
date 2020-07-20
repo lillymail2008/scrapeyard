@@ -1,0 +1,5 @@
+scrapy
+scrapy-puppeteer
+six
+importlib
+redis
