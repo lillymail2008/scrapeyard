@@ -12,6 +12,8 @@ import asyncio
 import pyppeteer
 import logging
 from concurrent.futures._base import TimeoutError
+from scrapy.spidermiddlewares.offsite import OffsiteMiddleware
+from scrapy.utils.httpobj import urlparse_cached
 
 pyppeteer_level = logging.WARNING
 logging.getLogger('websockets.protocol').setLevel(pyppeteer_level)
@@ -60,6 +62,7 @@ class CrawlSpiderMiddleware:
 
         # Must return only requests (not items).
         for r in start_requests:
+            self.logger.info("Deepan %s"%r.url);
             yield r
 
     def spider_opened(self, spider):
@@ -200,6 +203,7 @@ class PyppeteerMiddleware():
         return content, result, status
 
     def process_request(self, request, spider):
+        self.logger.info(request.url);
         """
         :param request: request object
         :param spider: spider object
@@ -217,3 +221,10 @@ class PyppeteerMiddleware():
     @classmethod
     def from_crawler(cls, crawler):
         return cls(**crawler.settings.get('PYPPETEER_ARGS', {}))
+
+class MyOffsiteMiddleware(OffsiteMiddleware):
+    def should_follow(self, request, spider):
+        regex = self.get_host_regex(spider)
+        # hostname can be None for wrong urls (like javascript links)
+        host = urlparse_cached(request).hostname or ''
+        return bool(regex.search(host))

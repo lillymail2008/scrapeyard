@@ -8,6 +8,29 @@ from . import connection, defaults
 
 # TODO: add SCRAPY_JOB support.
 class Scheduler(object):
+    """Redis-based scheduler
+
+    Settings
+    --------
+    SCHEDULER_PERSIST : bool (default: False)
+        Whether to persist or clear redis queue.
+    SCHEDULER_FLUSH_ON_START : bool (default: False)
+        Whether to flush redis queue on start.
+    SCHEDULER_IDLE_BEFORE_CLOSE : int (default: 0)
+        How many seconds to wait before closing if no message is received.
+    SCHEDULER_QUEUE_KEY : str
+        Scheduler redis key.
+    SCHEDULER_QUEUE_CLASS : str
+        Scheduler queue class.
+    SCHEDULER_DUPEFILTER_KEY : str
+        Scheduler dupefilter redis key.
+    SCHEDULER_DUPEFILTER_CLASS : str
+        Scheduler dupefilter class.
+    SCHEDULER_SERIALIZER : str
+        Scheduler serializer.
+
+    """
+
     def __init__(self, server,
                  persist=False,
                  flush_on_start=False,
@@ -17,6 +40,28 @@ class Scheduler(object):
                  dupefilter_cls=defaults.SCHEDULER_DUPEFILTER_CLASS,
                  idle_before_close=0,
                  serializer=None):
+        """Initialize scheduler.
+
+        Parameters
+        ----------
+        server : Redis
+            The redis server instance.
+        persist : bool
+            Whether to flush requests when closing. Default is False.
+        flush_on_start : bool
+            Whether to flush requests on start. Default is False.
+        queue_key : str
+            Requests queue key.
+        queue_cls : str
+            Importable path to the queue class.
+        dupefilter_key : str
+            Duplicates filter key.
+        dupefilter_cls : str
+            Importable path to the dupefilter class.
+        idle_before_close : int
+            Timeout before giving up.
+
+        """
         if idle_before_close < 0:
             raise TypeError("idle_before_close cannot be negative")
 

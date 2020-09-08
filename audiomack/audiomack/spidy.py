@@ -1,9 +1,9 @@
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
-
 from . import connection, defaults
 from .utils import bytes_to_str
+from urllib.parse import urlparse
 
 class RedisMixin(object):
     redis_key = None
@@ -30,9 +30,7 @@ class RedisMixin(object):
         settings = crawler.settings
 
         if self.redis_key is None:
-            self.redis_key = settings.get(
-                'REDIS_START_URLS_KEY', defaults.START_URLS_KEY,
-            )
+            self.redis_key = settings.get('REDIS_START_URLS_KEY', defaults.START_URLS_KEY,)
 
         self.redis_key = self.redis_key % {'name': self.name}
 
@@ -66,7 +64,6 @@ class RedisMixin(object):
             self.fetch_data = self.pop_priority_queue
         else:
             self.fetch_data = self.pop_list_queue
-
         crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
 
     def pop_list_queue(self, redis_key, batch_size):
@@ -100,8 +97,17 @@ class RedisMixin(object):
             self.logger.debug("Read %s requests from '%s'", found, self.redis_key)
 
     def make_request_from_data(self, data):
+        url = self.get_url_from_data(data)
+
+        parsed_uri = urlparse(url);
+        domain = '{uri.netloc}'.format(uri=parsed_uri)
+        setattr(self,"allowed_domains", [domain]);
+
+        return self.make_requests_from_url(url);
+
+    def get_url_from_data(self, data):
         url = bytes_to_str(data, self.redis_encoding)
-        return self.make_requests_from_url(url)
+        return url;
 
     def schedule_next_requests(self):
         """Schedules a request if available"""
@@ -113,14 +119,12 @@ class RedisMixin(object):
         self.schedule_next_requests()
         raise DontCloseSpider
 
-
 class RedisSpider(RedisMixin, Spider):
     @classmethod
     def from_crawler(self, crawler, *args, **kwargs):
         obj = super(RedisSpider, self).from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj
-
 
 class RedisCrawlSpider(RedisMixin, CrawlSpider):
     @classmethod

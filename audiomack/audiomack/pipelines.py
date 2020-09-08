@@ -9,9 +9,32 @@ default_serialize = ScrapyJSONEncoder().encode
 
 
 class RedisPipeline(object):
+    """Pushes serialized item into a redis list/queue
+
+    Settings
+    --------
+    REDIS_ITEMS_KEY : str
+        Redis key where to store items.
+    REDIS_ITEMS_SERIALIZER : str
+        Object path to serializer function.
+
+    """
+
     def __init__(self, server,
                  key=defaults.PIPELINE_KEY,
                  serialize_func=default_serialize):
+        """Initialize pipeline.
+
+        Parameters
+        ----------
+        server : StrictRedis
+            Redis client instance.
+        key : str
+            Redis key where to store items.
+        serialize_func : callable
+            Items serializer function.
+
+        """
         self.server = server
         self.key = key
         self.serialize = serialize_func
@@ -44,4 +67,10 @@ class RedisPipeline(object):
         return item
 
     def item_key(self, item, spider):
+        """Returns redis key based on given spider.
+
+        Override this function to use a different key depending on the item
+        and/or spider.
+
+        """
         return self.key % {'spider': spider.name}

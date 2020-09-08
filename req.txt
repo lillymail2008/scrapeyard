@@ -1,5 +1,7 @@
+pudb
 scrapy
 scrapy-puppeteer
 six
 importlib
 redis
+git+https://github.com/twisted/twisted.git@trunk
