@@ -23,7 +23,7 @@ ITEM_PIPELINES = {
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'audiomack.middlewares.CrawlDownloaderMiddleware': 543,
+    #'audiomack.middlewares.CrawlDownloaderMiddleware': 543,
     'audiomack.middlewares.PyppeteerMiddleware': 443
 }
 

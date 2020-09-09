@@ -1,6 +1,7 @@
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
+from scrapy import Request;
 from . import connection, defaults
 from .utils import bytes_to_str
 from urllib.parse import urlparse
@@ -103,7 +104,8 @@ class RedisMixin(object):
         domain = '{uri.netloc}'.format(uri=parsed_uri)
         setattr(self,"allowed_domains", [domain]);
 
-        return self.make_requests_from_url(url);
+        req = Request(url, meta={'render':True}, dont_filter=True);
+        return req;
 
     def get_url_from_data(self, data):
         url = bytes_to_str(data, self.redis_encoding)
