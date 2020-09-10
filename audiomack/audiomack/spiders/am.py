@@ -8,17 +8,13 @@ from urllib.parse import urlparse
 
 #redis-cli lpush am:start_urls https://www.cnn.com
 
-def my_request_processor(req, res):
-    req.meta['render'] = True
-    return req;
-
 class AmSpider(RedisCrawlSpider):
     name = "am"
     redis_key = 'am:start_urls'
 
     rules = (
-        Rule(LinkExtractor(), callback='parse_page', follow=True,  process_request=my_request_processor),
-        Rule(LinkExtractor(allow='/trending-now'), callback='parse_trending', follow=True, process_request=my_request_processor)
+        #Rule(LinkExtractor(), callback='parse_page', follow=True),
+        Rule(LinkExtractor(allow='www.audiomack.com/trending-now'), callback='parse_trending', follow=True),
     )
 
 #/html/body/div/div[3]/div/div/div/div[1]/div/div/div/div[1]/div[1]/div/a/h2
@@ -26,7 +22,6 @@ class AmSpider(RedisCrawlSpider):
     def parse_trending(self, response):
         item = response.xpath("//*[contains(@class, 'music__heading--artist')]").get()
         pass;
-
 
     '''
     def parse(self, response):
@@ -37,7 +32,6 @@ class AmSpider(RedisCrawlSpider):
         self.parse(response);
         return;
     '''
-
 
     def __init__(self, *args, **kwargs):
         # Dynamically define the allowed domains list.

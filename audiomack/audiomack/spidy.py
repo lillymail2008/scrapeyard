@@ -102,7 +102,7 @@ class RedisMixin(object):
 
         parsed_uri = urlparse(url);
         domain = '{uri.netloc}'.format(uri=parsed_uri)
-        setattr(self,"allowed_domains", [domain]);
+        setattr(self, "allowed_domains", [domain]);
 
         req = Request(url, meta={'render':True}, dont_filter=True);
         return req;

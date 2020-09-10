@@ -209,14 +209,14 @@ class PyppeteerMiddleware():
         :param spider: spider object
         :return: HtmlResponse
         """
-        if request.meta.get('render'):
-            try:
-                self.logger.debug('rendering %s', request.url)
-                html, result, status = self.render(request.url)
-                return HtmlResponse(url=request.url, body=html, request=request, encoding='utf-8',
-                                    status=status)
-            except websockets.exceptions.ConnectionClosed:
-                pass
+        #if request.meta.get('render'):
+        try:
+            self.logger.debug('rendering %s', request.url)
+            html, result, status = self.render(request.url)
+            return HtmlResponse(url=request.url, body=html, request=request, encoding='utf-8',
+                                status=status)
+        except websockets.exceptions.ConnectionClosed:
+            pass
 
     @classmethod
     def from_crawler(cls, crawler):
