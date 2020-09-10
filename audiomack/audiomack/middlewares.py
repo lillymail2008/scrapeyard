@@ -212,9 +212,13 @@ class PyppeteerMiddleware():
         #if request.meta.get('render'):
         try:
             self.logger.debug('rendering %s', request.url)
-            html, result, status = self.render(request.url)
-            return HtmlResponse(url=request.url, body=html, request=request, encoding='utf-8',
-                                status=status)
+
+            scrollDown1 = False;
+            if(request.meta.get('scrollyes')):
+                scrollDown1 = 10;
+
+            html, result, status = self.render(request.url, scrolldown=scrollDown1, sleep=5)
+            return HtmlResponse(url=request.url, body=html, request=request, encoding='utf-8', status=status)
         except websockets.exceptions.ConnectionClosed:
             pass
 

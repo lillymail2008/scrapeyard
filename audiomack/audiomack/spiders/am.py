@@ -14,11 +14,16 @@ class AmSpider(RedisCrawlSpider):
 
     rules = (
         #Rule(LinkExtractor(), callback='parse_page', follow=True),
-        Rule(LinkExtractor(allow='www.audiomack.com/trending-now'), callback='parse_trending', follow=True),
+        Rule(LinkExtractor(allow='www.audiomack.com/trending-now'), callback='parse_trending', follow=True, process_request='process_req'),
     )
 
 #/html/body/div/div[3]/div/div/div/div[1]/div/div/div/div[1]/div[1]/div/a/h2
 #/html/body/div/div[3]/div/div/div/div[2]/div/div/div/div[1]/div[1]/div/a/h2
+
+    def process_req(self, req, res):
+        req.meta['scrollyes'] = True;
+        return req;
+
     def parse_trending(self, response):
         item = response.xpath("//*[contains(@class, 'music__heading--artist')]").get()
         pass;
