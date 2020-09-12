@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.spiders import Rule
+from scrapy import Request
 from scrapy.linkextractors import LinkExtractor
 from ..spidy import RedisCrawlSpider
 from ..spidy import RedisSpider
@@ -13,20 +14,23 @@ class AmSpider(RedisCrawlSpider):
     redis_key = 'am:start_urls'
 
     rules = (
-        #Rule(LinkExtractor(), callback='parse_page', follow=True),
-        Rule(LinkExtractor(allow='www.audiomack.com/trending-now'), callback='parse_trending', follow=True, process_request='process_req'),
+        Rule(LinkExtractor(allow='www.audiomack.com/trending-now'), callback='parse_trending', follow=False, process_request='process_req'),
+        Rule(LinkExtractor(allow=[r'[\w\-]+/song/[\w\-]+']), callback='parse_song', follow=False)
     )
-
-#/html/body/div/div[3]/div/div/div/div[1]/div/div/div/div[1]/div[1]/div/a/h2
-#/html/body/div/div[3]/div/div/div/div[2]/div/div/div/div[1]/div[1]/div/a/h2
 
     def process_req(self, req, res):
         req.meta['scrollyes'] = True;
         return req;
 
-    def parse_trending(self, response):
-        item = response.xpath("//*[contains(@class, 'music__heading--artist')]").get()
+    def parse_song(self, response):
+        response;
         pass;
+
+    def parse_trending(self, response):
+        items = response.xpath("//*[contains(@class, 'music-detail__link')]/@href");
+        for item in items:
+            link = item.get();
+            #yield Request(link, meta={'render': True}, dont_filter=True);
 
     '''
     def parse(self, response):
